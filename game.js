@@ -16,6 +16,10 @@ let cycles = 100;
 // input
 let input = ""
 
+// curent hit
+let currentHitX = 0;
+let currentHitY = 0;
+
 function gameLoop(context) {
     handleInput();
     if (wait()) {
@@ -23,6 +27,10 @@ function gameLoop(context) {
     }
     moveBlock();
     if (hit(gameMap, currentBlock)) {
+        if (lost()) {
+            gameMap = createMap(emptySquare(), width, height);
+            return;
+        }
         unmoveBlock();
         insertBlock(gameMap, currentBlock);
         removeFilledRows(gameMap);
@@ -59,6 +67,10 @@ function isRowFilled(map, row) {
     return true;
 }
 
+function lost() {
+    return currentHitY > height - 2;
+}
+
 function hit(map, block) {
     for (let x = 0; x < block.mapSize; x++) {
         for (let y = 0; y < block.mapSize; y++) {
@@ -82,6 +94,8 @@ function hit(map, block) {
                 console.log("fudeu");
 
             if (mapSquare.empty == false && blockSquare.empty == false) {
+                currentHitX = block.x + x;
+                currentHitY = block.y + y;
                 return true;
             }
         }

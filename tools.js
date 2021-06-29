@@ -48,8 +48,9 @@ function cloneMap(map) {
 }
 
 function drawMap(context, map, width, height, squareSize) {
-    const backGroundColor = "black";
-    drawBackground(context, width, height, squareSize, backGroundColor);
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 200, 200);
+    drawString(context, "Score:1234");
     drawSquares(context, map, width, height, squareSize);
 }
 
@@ -74,19 +75,21 @@ function calculateSquarePixels(x, y, width, height, squareSize) {
     }
 }
 
-function drawBackground(context, width, height, squareSize, color) {
-    context.fillStyle = color;
-    context.fillRect(0, 0, width * squareSize, height * squareSize);
-}
-
 function drawSquare(context, squarePixels, color) {
     const startX = squarePixels.startX;
     const startY = squarePixels.startY;
     const endX = squarePixels.endX;
     const endY = squarePixels.endY;
 
+    // offsets to place game a little down
+    const yOffset = 100;
+    const xOffset = 0;
+
+    // border
+    const border = 2
+
     context.fillStyle = "black";
-    context.fillRect(startX, startY, endX, endY);
+    context.fillRect(startX + xOffset, startY + yOffset, endX + xOffset, endY + yOffset);
     context.fillStyle = color;
-    context.fillRect(startX + 2, startY + 2, endX + 2, endY + 2);
+    context.fillRect(startX + border + xOffset, startY + border + yOffset, endX + border + xOffset, endY + border + yOffset);
 }
