@@ -48,9 +48,6 @@ function cloneMap(map) {
 }
 
 function drawMap(context, map, width, height, squareSize) {
-    context.fillStyle = "black";
-    context.fillRect(0, 0, 200, 200);
-    drawString(context, "Score:1234");
     drawSquares(context, map, width, height, squareSize);
 }
 
@@ -82,7 +79,7 @@ function drawSquare(context, squarePixels, color) {
     const endY = squarePixels.endY;
 
     // offsets to place game a little down
-    const yOffset = 100;
+    const yOffset = 20;
     const xOffset = 0;
 
     // border

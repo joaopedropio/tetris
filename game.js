@@ -20,6 +20,9 @@ let input = ""
 let currentHitX = 0;
 let currentHitY = 0;
 
+// score
+let score = 0;
+
 function gameLoop(context) {
     handleInput();
     if (wait()) {
@@ -29,24 +32,57 @@ function gameLoop(context) {
     if (hit(gameMap, currentBlock)) {
         if (lost()) {
             gameMap = createMap(emptySquare(), width, height);
+            score = 0;
             return;
         }
         unmoveBlock();
         insertBlock(gameMap, currentBlock);
         removeFilledRows(gameMap);
+        increaseScore("lockedBlock");
         currentBlock = setNewBlock();
     }
     let clonedMap = cloneMap(gameMap);
     insertBlock(clonedMap, currentBlock);
     drawMap(context, clonedMap, width, height, squareSize);
+    drawScore();
+}
+
+function drawScore() {
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 200, 10);
+    drawString(context, "Score:" + score);
+}
+
+function increaseScore(reason, count) {
+    switch (reason) {
+        case "lockedBlock":
+            score += height - currentHitY;
+            break;
+        case "deletedRows":
+            switch (count) {
+                case 1: score += 40;   break;
+                case 2: score += 100;  break;
+                case 3: score += 300;  break;
+                case 4: score += 1200; break;
+                default:               break;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 function removeFilledRows(map) {
+    let rowsFilledCount = 0;
     for (let i = 0; i < height - 1; i++) {
         if (isRowFilled(map, i)) {
             shiftRows(map, i + 1, height - 1)
+            rowsFilledCount++;
             i--;
         }
+    }
+    if (rowsFilledCount > 0) {
+        increaseScore("deletedRows", rowsFilledCount);
     }
 }
 
