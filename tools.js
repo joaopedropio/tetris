@@ -1,3 +1,13 @@
+// square border
+const border = 2;
+
+// map square
+const borderWidth = 10;
+
+// offsets to place game a little down
+const yOffset = 80;
+const xOffset = 0 + borderWidth;
+
 function cloneSquare(square) {
     return {
         empty: square.empty,
@@ -49,14 +59,42 @@ function cloneMap(map) {
 
 function drawMap(context, map, width, height, squareSize) {
     drawSquares(context, map, width, height, squareSize);
+    drawMapBorder(context, width, height, squareSize);
+}
+
+function drawMapBorder(context, width, height, squareSize) {
+    const halfBorder = borderWidth / 2;
+    context.strokeStyle = "white";
+    context.lineWidth = borderWidth;
+    context.strokeRect(xOffset + border - halfBorder, yOffset - halfBorder, (width * squareSize) + xOffset, ((height - 1) * squareSize) + yOffset - 30);
+
+    context.strokeStyle = "black";
+    context.lineWidth = border;
+    context.strokeRect(xOffset + border, yOffset, (width * squareSize) + xOffset - borderWidth , ((height - 1) * squareSize) + yOffset - 40);
+
+    // fix "leaking squares to the right"
+    context.strokeStyle = "black";
+    context.lineWidth = borderWidth;
+    context.beginPath();
+    context.moveTo((width * squareSize) + xOffset + borderWidth + halfBorder, yOffset);
+    context.lineTo((width * squareSize) + xOffset + borderWidth + halfBorder, (height * squareSize) + yOffset + borderWidth);
+    context.closePath();
+    context.stroke();
+
+    // fix "leaking squares to the bottom"
+    context.strokeStyle = "black";
+    context.lineWidth = borderWidth * 2;
+    context.beginPath();
+    context.moveTo(xOffset , (height * squareSize) + yOffset + (borderWidth * 2));
+    context.lineTo((width * (squareSize + 2)) + xOffset , (height * squareSize) + yOffset + (borderWidth * 2));
+    context.closePath();
+    context.stroke();
 }
 
 function drawSquares(context, map, width, height, squareSize) {
     for (let y = height - 1; y >= 0; y--) {
         for (let x = 0; x < width; x++) {
             const current = map[x][y];
-            if (current == undefined)
-                console.log("fudeu");
             pixels = calculateSquarePixels(x, y, width, height, squareSize);
             drawSquare(context, pixels, current.color);
         }
@@ -72,18 +110,20 @@ function calculateSquarePixels(x, y, width, height, squareSize) {
     }
 }
 
+function calculateSquarePixelsWithOffset(x, y, squareSize, offsetX, offsetY, blockSize) {
+    return {
+        startX: (x * squareSize) + offsetX,
+        startY: (y * squareSize) + offsetY,
+        endX: squareSize,
+        endY: squareSize
+    }
+}
+
 function drawSquare(context, squarePixels, color) {
     const startX = squarePixels.startX;
     const startY = squarePixels.startY;
     const endX = squarePixels.endX;
     const endY = squarePixels.endY;
-
-    // offsets to place game a little down
-    const yOffset = 20;
-    const xOffset = 0;
-
-    // border
-    const border = 2
 
     context.fillStyle = "black";
     context.fillRect(startX + xOffset, startY + yOffset, endX + xOffset, endY + yOffset);

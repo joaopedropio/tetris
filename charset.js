@@ -1,13 +1,13 @@
-function drawString(context, n) {
+function drawString(context, n, offsetX, offsetY) {
     const chars = n.split('');
-    const offset = 6;
+    const offsetNextChar = 6;
     const size = 2;
     for (let i = 0; i < chars.length; i++) {
-        drawChar(context, chars[i], i * offset, size);
+        drawChar(context, chars[i], i * offsetNextChar, size, offsetX, offsetY);
     }
 }
 
-function drawChar(context, c, offset, size) {
+function drawChar(context, c, offsetNextChar, size, offsetX, offsetY) {
     const ch = charMatrix(c);
     for (let x = 1; x < 7; x++) {
         for (let y = 1; y < 9; y++) {
@@ -17,12 +17,13 @@ function drawChar(context, c, offset, size) {
             } else {
                 context.fillStyle = "black";
             }
-            context.fillRect((x + offset) * size, y * size, (x + offset) * size, y * size);
+            context.fillRect(((x + offsetNextChar) * size) + offsetX, (y * size) + offsetY, ((x + offsetNextChar) * size) + offsetX, (y * size) + offsetY);
         }
     }
 }
 
 function charMatrix(ch) {
+    // numbers
     let numberX = [
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
@@ -144,6 +145,19 @@ function charMatrix(ch) {
         [0, 0, 1, 1, 1, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
     ];
+
+    // letters
+    let N = [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 1, 1, 0, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 0, 1, 1, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ];
     let S = [
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 1, 1, 1, 0],
@@ -199,15 +213,37 @@ function charMatrix(ch) {
         [0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
     ];
+    let t = [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ];
+    let x = [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ];
 
     // symbols
     let space = [
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
@@ -239,11 +275,14 @@ function charMatrix(ch) {
     map.set("9", number9);
 
     // letters
+    map.set("N", N);
     map.set("S", S);
     map.set("c", c);
     map.set("o", o);
     map.set("r", r);
     map.set("e", e);
+    map.set("x", x);
+    map.set("t", t);
 
     // symbols
     map.set(" ", space);

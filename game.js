@@ -1,11 +1,13 @@
 // board size
 const width = 10;
 const height = 20;
-const squareSize = 20;
+const squareSize = 40;
 const backGroundColor = "black";
 
 //
 let currentBlock = setNewBlock();
+let nextBlock = setNewBlock();
+
 //
 let gameMap = createMap(emptySquare(), width, height);
 
@@ -23,7 +25,18 @@ let currentHitY = 0;
 // score
 let score = 0;
 
+let firstLoop = 0;
+
+function initialize() {
+    if (firstLoop == 0) {
+        firstLoop++;
+    }
+    drawNextBlock(nextBlock);
+    drawScore();
+}
+
 function gameLoop(context) {
+    initialize();
     handleInput();
     if (wait()) {
         return;
@@ -39,18 +52,49 @@ function gameLoop(context) {
         insertBlock(gameMap, currentBlock);
         removeFilledRows(gameMap);
         increaseScore("lockedBlock");
-        currentBlock = setNewBlock();
+        currentBlock = nextBlock;
+        nextBlock = setNewBlock();
+        drawScore();
     }
     let clonedMap = cloneMap(gameMap);
     insertBlock(clonedMap, currentBlock);
     drawMap(context, clonedMap, width, height, squareSize);
-    drawScore();
+}
+
+function drawNextBlock(block) {
+    context.fillStyle = "black";
+    context.fillRect(420, 0, 100, 200);
+    drawString(context, " Next", 425, 190);
+
+    context.fillStyle = "black";
+    context.fillRect(420, 210, 100, 60);
+
+    const map = block.map();
+    let offsetY = 170;
+    let offsetX = 420;
+    if (map.length == 3) {
+        offsetX += 10
+    }
+    let ln = map.length;
+    for (let y = 1; y <= ln; y++) {
+        for (let x = 0; x <= ln; x++) {
+            let color = ""
+            if (x == ln || y == ln) {
+                color = "black"
+            } else {
+                color = map[x][ln - y].color;
+            }
+            let pixels = calculateSquarePixelsWithOffset(x, y, squareSize, offsetX, offsetY, ln);
+            drawSquare(context, pixels, color);
+        }
+    }
+
 }
 
 function drawScore() {
     context.fillStyle = "black";
     context.fillRect(0, 0, 200, 10);
-    drawString(context, "Score:" + score);
+    drawString(context, "Score:" + score, 0, 0);
 }
 
 function increaseScore(reason, count) {
