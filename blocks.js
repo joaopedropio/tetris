@@ -1,4 +1,3 @@
-
 function IBlock() {
     const up = [
         {x: 0, y: 2},
@@ -254,6 +253,7 @@ function createBlock(squares, color, mapSize) {
 
 class Block {
     constructor(spins, mapSize) {
+        this.id = uuidv4();
         this.mapSize = mapSize;
         this.spins = spins;
         this.currentMap = 0;
