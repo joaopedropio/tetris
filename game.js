@@ -1,7 +1,7 @@
 // board size
 const width = 10;
 const height = 20;
-const squareSize = 40;
+const squareSize = 24;
 const backGroundColor = "black";
 
 //

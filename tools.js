@@ -66,18 +66,18 @@ function drawMapBorder(context, width, height, squareSize) {
     const halfBorder = borderWidth / 2;
     context.strokeStyle = "white";
     context.lineWidth = borderWidth;
-    context.strokeRect(xOffset + border - halfBorder, yOffset - halfBorder, (width * squareSize) + xOffset, ((height - 1) * squareSize) + yOffset - 30);
+    context.strokeRect(xOffset + border - halfBorder, yOffset - halfBorder, (width * squareSize) + xOffset, ((height - 1) * squareSize) + yOffset - 45);
 
     context.strokeStyle = "black";
     context.lineWidth = border;
-    context.strokeRect(xOffset + border, yOffset, (width * squareSize) + xOffset - borderWidth , ((height - 1) * squareSize) + yOffset - 40);
+    context.strokeRect(xOffset + border, yOffset, (width * squareSize) + xOffset - borderWidth , ((height - 1) * squareSize) + yOffset - 55);
 
     // fix "leaking squares to the right"
     context.strokeStyle = "black";
     context.lineWidth = borderWidth;
     context.beginPath();
-    context.moveTo((width * squareSize) + xOffset + borderWidth + halfBorder, yOffset);
-    context.lineTo((width * squareSize) + xOffset + borderWidth + halfBorder, (height * squareSize) + yOffset + borderWidth);
+    context.moveTo((width * squareSize) + xOffset + borderWidth + halfBorder + 2, yOffset);
+    context.lineTo((width * squareSize) + xOffset + borderWidth + halfBorder + 2, (height * squareSize) + yOffset + borderWidth);
     context.closePath();
     context.stroke();
 
