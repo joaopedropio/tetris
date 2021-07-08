@@ -25,10 +25,10 @@ function IBlock() {
     ];
     const mapSize = 4;
     const spins = [
-        createBlock(up,    "aqua", mapSize),
-        createBlock(right, "aqua", mapSize),
-        createBlock(down,  "aqua", mapSize),
-        createBlock(left,  "aqua", mapSize)
+        createSpin(up,    "aqua", mapSize, "up"),
+        createSpin(right, "aqua", mapSize, "right"),
+        createSpin(down,  "aqua", mapSize, "down"),
+        createSpin(left,  "aqua", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -60,10 +60,10 @@ function JBlock() {
     ];
     const mapSize = 3;
     const spins = [
-        createBlock(up,    "blue", mapSize),
-        createBlock(right, "blue", mapSize),
-        createBlock(down,  "blue", mapSize),
-        createBlock(left,  "blue", mapSize)
+        createSpin(up,    "blue", mapSize, "up"),
+        createSpin(right, "blue", mapSize, "right"),
+        createSpin(down,  "blue", mapSize, "down"),
+        createSpin(left,  "blue", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -95,10 +95,10 @@ function LBlock() {
     ];
     const mapSize = 3;
     const spins = [
-        createBlock(up,    "orange", mapSize),
-        createBlock(right, "orange", mapSize),
-        createBlock(down,  "orange", mapSize),
-        createBlock(left,  "orange", mapSize)
+        createSpin(up,    "orange", mapSize, "up"),
+        createSpin(right, "orange", mapSize, "right"),
+        createSpin(down,  "orange", mapSize, "down"),
+        createSpin(left,  "orange", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -130,10 +130,10 @@ function OBlock() {
     ];
     const mapSize = 4;
     const spins = [
-        createBlock(up,    "yellow", mapSize),
-        createBlock(right, "yellow", mapSize),
-        createBlock(down,  "yellow", mapSize),
-        createBlock(left,  "yellow", mapSize)
+        createSpin(up,    "yellow", mapSize, "up"),
+        createSpin(right, "yellow", mapSize, "right"),
+        createSpin(down,  "yellow", mapSize, "down"),
+        createSpin(left,  "yellow", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -165,10 +165,10 @@ function SBlock() {
     ];
     const mapSize = 3;
     const spins = [
-        createBlock(up,    "lime", mapSize),
-        createBlock(right, "lime", mapSize),
-        createBlock(down,  "lime", mapSize),
-        createBlock(left,  "lime", mapSize)
+        createSpin(up,    "lime", mapSize, "up"),
+        createSpin(right, "lime", mapSize, "right"),
+        createSpin(down,  "lime", mapSize, "down"),
+        createSpin(left,  "lime", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -200,10 +200,10 @@ function TBlock() {
     ];
     const mapSize = 3;
     const spins = [
-        createBlock(up,    "fuchsia", mapSize),
-        createBlock(right, "fuchsia", mapSize),
-        createBlock(down,  "fuchsia", mapSize),
-        createBlock(left,  "fuchsia", mapSize)
+        createSpin(up,    "fuchsia", mapSize, "up"),
+        createSpin(right, "fuchsia", mapSize, "right"),
+        createSpin(down,  "fuchsia", mapSize, "down"),
+        createSpin(left,  "fuchsia", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
@@ -235,20 +235,23 @@ function ZBlock() {
     ];
     const mapSize = 3;
     const spins = [
-        createBlock(up,    "red", mapSize),
-        createBlock(right, "red", mapSize),
-        createBlock(down,  "red", mapSize),
-        createBlock(left,  "red", mapSize)
+        createSpin(up,    "red", mapSize, "up"),
+        createSpin(right, "red", mapSize, "right"),
+        createSpin(down,  "red", mapSize, "down"),
+        createSpin(left,  "red", mapSize, "left")
     ]
     return new Block(spins, mapSize)
 }
 
-function createBlock(squares, color, mapSize) {
+function createSpin(squares, color, mapSize, orientation) {
     map = createMap(emptySquare(), mapSize, mapSize);
     squares.forEach(square => {
         map[square.x][square.y] = createSquare(color);
     });
-    return map;
+    return {
+        map: map,
+        orientation: orientation
+    };
 }
 
 class Block {
@@ -256,13 +259,17 @@ class Block {
         this.id = uuidv4();
         this.mapSize = mapSize;
         this.spins = spins;
-        this.currentMap = 0;
+        this.currentSpin = 0;
         this.x = 0;
         this.y = 0;
     }
 
     map() {
-        return cloneMap(this.spins[this.currentMap]);
+        return cloneMap(this.spins[this.currentSpin].map);
+    }
+
+    orientation() {
+        return this.spins[this.currentSpin].orientation;
     }
 
     mapSize() {
@@ -271,18 +278,57 @@ class Block {
 
     spin(direction) {
         if (direction == "clockwise") {
-            if (this.currentMap == 3) {
-                this.currentMap = 0;
+            if (this.currentSpin == 3) {
+                this.currentSpin = 0;
                 return;
             }
-            this.currentMap++;
+            this.currentSpin++;
         }
         if (direction == "counterClockwise") {
-            if (this.currentMap == 0) {
-                this.currentMap = 3
+            if (this.currentSpin == 0) {
+                this.currentSpin = 3
                 return;
             }
-            this.currentMap--;
+            this.currentSpin--;
         }
+    }
+
+    moveDown(map) {
+        if ((this.y) > 0) {
+            this.y--;
+            if (hit(map, this)) {
+                this.y++;
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    moveRight(map) {
+        this.x++;
+        if (hit(map, this)) {
+            this.x--;
+            return false;
+        }
+        return true;
+    }
+    
+    moveLeft(map) {
+        this.x--;
+        if (hit(map, this)) {
+            this.x++;
+            return false;
+        }
+        return true;
+    }
+    
+    unmoveBlock() {
+        this.y++;
+    }
+    
+    moveBlock() {
+        this.y--;
     }
 }

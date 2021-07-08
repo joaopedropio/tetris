@@ -16,8 +16,8 @@ let count = 0;
 let cycles = 100;
 
 // input
-let inputInterface = "human";
-// let inputInterface = "bot";
+// let inputInterface = "human";
+let inputInterface = "bot";
 let input = "";
 
 // curent hit
@@ -37,6 +37,7 @@ function initialize() {
     }
     drawNextBlock(nextBlock);
     drawScore();
+    bot.whereToMove(gameMap, currentBlock, nextBlock);
 }
 
 function gameLoop(context) {
@@ -45,20 +46,21 @@ function gameLoop(context) {
     if (wait()) {
         return;
     }
-    moveBlock();
+    currentBlock.moveBlock();
     if (hit(gameMap, currentBlock)) {
         if (lost()) {
             gameMap = createMap(emptySquare(), width, height);
             score = 0;
             return;
         }
-        unmoveBlock();
+        currentBlock.unmoveBlock();
         insertBlock(gameMap, currentBlock);
         removeFilledRows(gameMap);
         increaseScore("lockedBlock");
         currentBlock = nextBlock;
         nextBlock = setNewBlock();
         drawScore();
+        bot.whereToMove(gameMap, currentBlock, nextBlock);
     }
     let clonedMap = cloneMap(gameMap);
     insertBlock(clonedMap, currentBlock);
@@ -182,12 +184,6 @@ function randomBlock() {
     ]
     const index = getRandomInt(0, 7);
     return blocks[index];
-}
-
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function wait() {

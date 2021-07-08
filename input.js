@@ -1,36 +1,39 @@
 function handleInput() {
     if (inputInterface == "human") {
-        move(input);
+        move(currentBlock, input);
     }
 
     if (inputInterface == "bot") {
-        let direction = bot.whereToMove(gameMap, currentBlock, nextBlock)
-        move(direction);
+        let direction = bot.nextMove();
+        if (direction != undefined && direction != "down") {
+            move(currentBlock, direction);
+        }
     }
+    input = "";
 }
 
-function move(direction) {
+function move(block, direction) {
     if (direction == "" || direction == undefined) {
         return;
     }
 
     if (direction == "clockwise" || direction == "counterClockwise") {
-        currentBlock.spin(direction);
+        block.spin(direction);
     }
 
     if (direction == "left") {
-        moveLeft();
+        block.moveLeft(gameMap);
     }
 
     if (direction == "down") {
-        moveDown();
+        block.moveDown(gameMap);
     }
 
     if (direction == "right") {
-        moveRight();
+        block.moveRight(gameMap);
     }
+
     let clonedMap = cloneMap(gameMap);
-    insertBlock(clonedMap, currentBlock);
+    insertBlock(clonedMap, block);
     drawMap(context, clonedMap, width, height, squareSize);
-    input = "";
 }

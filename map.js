@@ -18,20 +18,3 @@ function createMap(value, x, y) {
     }
     return map;
 }
-
-function cloneMap(map) {
-    if (map == undefined || map.length == 0)
-        return undefined;
-
-    const x = map.length;
-    const y = map[0].length;
-    let clone = createMap(null, x, y)
-
-    for (let i = 0; i < x; i++) {
-        for (let j = 0; j < y; j++) {
-            let square = map[i][j];
-            clone[i][j] = cloneSquare(square);
-        }   
-    }
-    return clone;
-}
