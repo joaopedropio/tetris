@@ -13,10 +13,12 @@ let gameMap = createMap(emptySquare(), width, height);
 
 // timer
 let count = 0;
-let cycles = 100;
+let cycles = 10;
 
 // input
-let input = ""
+// let inputInterface = "human";
+let inputInterface = "bot";
+let input = "";
 
 // curent hit
 let currentHitX = 0;
@@ -24,15 +26,19 @@ let currentHitY = 0;
 
 // score
 let score = 0;
-
 let firstLoop = 0;
 
+// bot
+const bot = new Bot();
+
 function initialize() {
-    if (firstLoop == 0) {
-        firstLoop++;
+    if (firstLoop != 0) {
+        return;
     }
     drawNextBlock(nextBlock);
     drawScore();
+    bot.whereToMove(gameMap, currentBlock, nextBlock);
+    firstLoop++;
 }
 
 function gameLoop(context) {
@@ -41,60 +47,26 @@ function gameLoop(context) {
     if (wait()) {
         return;
     }
-    moveBlock();
+    currentBlock.moveBlock();
     if (hit(gameMap, currentBlock)) {
         if (lost()) {
             gameMap = createMap(emptySquare(), width, height);
             score = 0;
             return;
         }
-        unmoveBlock();
+        currentBlock.unmoveBlock();
         insertBlock(gameMap, currentBlock);
         removeFilledRows(gameMap);
         increaseScore("lockedBlock");
         currentBlock = nextBlock;
         nextBlock = setNewBlock();
+        drawNextBlock(nextBlock);
         drawScore();
+        bot.whereToMove(gameMap, currentBlock, nextBlock);
     }
     let clonedMap = cloneMap(gameMap);
     insertBlock(clonedMap, currentBlock);
     drawMap(context, clonedMap, width, height, squareSize);
-}
-
-function drawNextBlock(block) {
-    context.fillStyle = "black";
-    context.fillRect(420, 0, 100, 200);
-    drawString(context, " Next", 425, 190);
-
-    context.fillStyle = "black";
-    context.fillRect(420, 210, 100, 60);
-
-    const map = block.map();
-    let offsetY = 170;
-    let offsetX = 420;
-    if (map.length == 3) {
-        offsetX += 10
-    }
-    let ln = map.length;
-    for (let y = 1; y <= ln; y++) {
-        for (let x = 0; x <= ln; x++) {
-            let color = ""
-            if (x == ln || y == ln) {
-                color = "black"
-            } else {
-                color = map[x][ln - y].color;
-            }
-            let pixels = calculateSquarePixelsWithOffset(x, y, squareSize, offsetX, offsetY, ln);
-            drawSquare(context, pixels, color);
-        }
-    }
-
-}
-
-function drawScore() {
-    context.fillStyle = "black";
-    context.fillRect(0, 0, 200, 10);
-    drawString(context, "Score:" + score, 0, 0);
 }
 
 function increaseScore(reason, count) {
@@ -155,7 +127,7 @@ function hit(map, block) {
     for (let x = 0; x < block.mapSize; x++) {
         for (let y = 0; y < block.mapSize; y++) {
             let mapSquare;
-            if (block.y + y >= height) {
+            if (block.y + y >= height && ((block.x + x) >= 0 && (block.x + x) < width)) {
                 mapSquare = emptySquare();
             } else if (block.y + y < 0 || block.y + y >= height ||
                        block.x + x < 0 || block.x + x >= width) {
@@ -165,10 +137,6 @@ function hit(map, block) {
             }
 
             const blockSquare = block.map()[x][y];
-
-            if (block.y + y >= height) {
-                break;
-            }
 
             if (mapSquare == undefined || blockSquare == undefined)
                 console.log("fudeu");
@@ -183,32 +151,6 @@ function hit(map, block) {
     return false;
 }
 
-function handleInput() {
-    if (input == "") {
-        return;
-    }
-
-    if (input == "clockwise" || input == "counterClockwise") {
-        currentBlock.spin(input);
-    }
-
-    if (input == "left") {
-        moveLeft();
-    }
-
-    if (input == "down") {
-        moveDown();
-    }
-
-    if (input == "right") {
-        moveRight();
-    }
-    let clonedMap = cloneMap(gameMap);
-    insertBlock(clonedMap, currentBlock);
-    drawMap(context, clonedMap, width, height, squareSize);
-    input = "";
-}
-
 function setNewBlock() {
     let block = randomBlock();
     block.y = height;
@@ -216,42 +158,6 @@ function setNewBlock() {
     return block;
 }
 
-function moveDown() {
-    if ((currentBlock.y) > 0) {
-        currentBlock.y--;
-        if (hit(gameMap, currentBlock)) {
-            currentBlock.y++;
-        }
-    }
-}
-
-function moveRight() {
-    originalX = currentBlock.x;
-
-    currentBlock.x++;
-    for (let i = 0; i < 4; i++) {
-        if (hit(gameMap, currentBlock)) {
-            currentBlock.x--;
-        } else {
-            break;
-        }
-    }
-}
-
-function moveLeft() {
-    currentBlock.x--;
-    if (hit(gameMap, currentBlock)) {
-        currentBlock.x++;
-    }
-}
-
-function unmoveBlock() {
-    currentBlock.y++;
-}
-
-function moveBlock() {
-    currentBlock.y--;
-}
 
 function insertBlock(map, block) {
     for (let i = 0; i < block.mapSize; i++) {
@@ -274,7 +180,7 @@ function randomBlock() {
         TBlock(),
         ZBlock()
     ]
-    const index = Math.floor(Math.random() * 10) % 7;
+    const index = getRandomInt(0, 7);
     return blocks[index];
 }
 

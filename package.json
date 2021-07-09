@@ -1,9 +1,12 @@
 {
-  "name": "builder",
+  "name": "tetris",
   "version": "1.0.0",
   "main": "index.html",
   "scripts": {
     "dev": "nw .",
     "prod": "nwbuild -p linux64 -o dist ."
+  },
+  "devDependencies": {
+    "nw-builder": "^3.5.7"
   }
 }
