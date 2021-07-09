@@ -18,6 +18,7 @@ class Bot {
             if (!this.job.isDone) {
                 this.job.cancel();
             }
+            this.currentBlockId = current.id;
             this.job = new MoveJob(cloneMap(board), cloneBlock(current), cloneBlock(next));
             this.job.calculate();
         }
@@ -52,18 +53,15 @@ class MoveJob {
 
     async calculate() {
         let plays = this.calculatePlays();
-
         let bestPlay = this.pickBestPlay(plays);
-
         this.moviments = bestPlay.moviments;
-
         this.done = true;
     }
 
     pickBestPlay(plays) {
         let bestPlay = plays[0];
         for (let i = 1; i < plays.length; i++) {
-            if (plays[i].points > bestPlay.points) {
+            if (plays[i].score > bestPlay.score) {
                 bestPlay = plays[i];
             }
         }
@@ -73,53 +71,82 @@ class MoveJob {
     calculatePlays() {
         const width = 10;
         let plays = [];
-        let currentX = -10;
-        for (let i = 0; i < width; i++) {
-            let currentMap = cloneMap(this.map);
-            let moviments = [];
-            let block = cloneBlock(this.currentBlock);
+        let currentX = this.mostLeftPossible(this.currentBlock, this.map);
 
-            block.moveDown(currentMap);
-            block.moveDown(currentMap);
-            moviments.push("down");
-            moviments.push("down");
+        const turns = ["nothing", "clockwise", "doubleClockwise", "counterClockwise"]
+        for (let j = 0; j < turns.length; j++) {
+            let spinnedBlock = cloneBlock(this.currentBlock);
+            let rotations = [];
+            switch (turns[j]) {
+                case "clockwise":
+                    spinnedBlock.spin("clockwise");
+                    rotations.push("clockwise");
+                    break;
+                case "doubleClockwise":
+                    spinnedBlock.spin("clockwise");
+                    rotations.push("clockwise");
+                    spinnedBlock.spin("clockwise");
+                    rotations.push("clockwise");
+                    break;
+                case "counterClockwise":
+                    spinnedBlock.spin("counterClockwise");
+                    rotations.push("counterClockwise");
+                    break;
+                case "nothing":
+                default:
+                    break;
+            }
+            for (let i = 0; i < width; i++) {
+                let moviments = [];
+                for (let k = 0; k < rotations.length; k++) {
+                    moviments.push(rotations[k]);
+                }
+                let currentMap = cloneMap(this.map);
+                let block = cloneBlock(spinnedBlock);
 
-            if (block.x > currentX) {
-                while(block.moveLeft(currentMap)) {
-                    if (block.x < -5) {
-                        return plays;
+                if (block.x > currentX) {
+                    while(block.x > currentX) {
+                        if(block.moveLeft(currentMap)) {
+                            moviments.push("left");
+                        } else {
+                            break;
+                        }
                     }
-                    moviments.push("left");
+                } else if (block.x < currentX) {
+                    while(block.x < currentX) {
+                        if (block.moveRight(currentMap)) {
+                            moviments.push("right");
+                        } else {
+                            break;
+                        }
+                    }
                 }
-            } else if (currentX > block.x) {
-                if (block.moveRight(currentMap)) {
-                    moviments.push("right");
-                } else {
-                    return plays;
+                currentX++;
+        
+                while(block.moveDown(currentMap)) {
+                    moviments.push("down");
                 }
-            }
-            currentX = block.x + 1;
-    
-            while(block.moveDown(currentMap)) {
-                if (block.y < -5) {
-                    return plays;
-                }
-                moviments.push("down");
-            }
 
-            insertBlock(currentMap, block);
+                insertBlock(currentMap, block);
 
-            score = this.calculatePoints(currentMap);
-            plays.push({
-                score: score,
-                moviments: moviments 
-            });
+                let points = calculatePoints(currentMap);
+                plays.push({
+                    score: points,
+                    moviments: moviments 
+                });
+            }
         }
-
         return plays;
     }
 
-    calculatePoints(map) {
-        return getRandomInt(0, 1000);
+    mostLeftPossible(block, map) {
+        let clonedBlock = cloneBlock(block);
+        let clonedMap = cloneMap(map);
+        while(clonedBlock.moveLeft(clonedMap)) {
+            if (clonedBlock.x < -5) {
+                break;
+            }
+        }
+        return clonedBlock.x;
     }
 }

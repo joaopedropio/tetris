@@ -13,7 +13,7 @@ let gameMap = createMap(emptySquare(), width, height);
 
 // timer
 let count = 0;
-let cycles = 100;
+let cycles = 10;
 
 // input
 // let inputInterface = "human";
@@ -32,12 +32,13 @@ let firstLoop = 0;
 const bot = new Bot();
 
 function initialize() {
-    if (firstLoop == 0) {
-        firstLoop++;
+    if (firstLoop != 0) {
+        return;
     }
     drawNextBlock(nextBlock);
     drawScore();
     bot.whereToMove(gameMap, currentBlock, nextBlock);
+    firstLoop++;
 }
 
 function gameLoop(context) {
@@ -59,6 +60,7 @@ function gameLoop(context) {
         increaseScore("lockedBlock");
         currentBlock = nextBlock;
         nextBlock = setNewBlock();
+        drawNextBlock(nextBlock);
         drawScore();
         bot.whereToMove(gameMap, currentBlock, nextBlock);
     }
@@ -125,7 +127,7 @@ function hit(map, block) {
     for (let x = 0; x < block.mapSize; x++) {
         for (let y = 0; y < block.mapSize; y++) {
             let mapSquare;
-            if (block.y + y >= height) {
+            if (block.y + y >= height && ((block.x + x) >= 0 && (block.x + x) < width)) {
                 mapSquare = emptySquare();
             } else if (block.y + y < 0 || block.y + y >= height ||
                        block.x + x < 0 || block.x + x >= width) {
@@ -135,10 +137,6 @@ function hit(map, block) {
             }
 
             const blockSquare = block.map()[x][y];
-
-            if (block.y + y >= height) {
-                break;
-            }
 
             if (mapSquare == undefined || blockSquare == undefined)
                 console.log("fudeu");

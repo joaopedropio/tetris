@@ -30,7 +30,7 @@ function IBlock() {
         createSpin(down,  "aqua", mapSize, "down"),
         createSpin(left,  "aqua", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "I-Block")
 }
 
 function JBlock() {
@@ -65,7 +65,7 @@ function JBlock() {
         createSpin(down,  "blue", mapSize, "down"),
         createSpin(left,  "blue", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "J-Block")
 }
 
 function LBlock() {
@@ -100,7 +100,7 @@ function LBlock() {
         createSpin(down,  "orange", mapSize, "down"),
         createSpin(left,  "orange", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "L-Block")
 }
 
 function OBlock() {
@@ -135,7 +135,7 @@ function OBlock() {
         createSpin(down,  "yellow", mapSize, "down"),
         createSpin(left,  "yellow", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "O-Block")
 }
 
 function SBlock() {
@@ -170,7 +170,7 @@ function SBlock() {
         createSpin(down,  "lime", mapSize, "down"),
         createSpin(left,  "lime", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "S-Block")
 }
 
 function TBlock() {
@@ -205,7 +205,7 @@ function TBlock() {
         createSpin(down,  "fuchsia", mapSize, "down"),
         createSpin(left,  "fuchsia", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "T-Block")
 }
 
 function ZBlock() {
@@ -240,7 +240,7 @@ function ZBlock() {
         createSpin(down,  "red", mapSize, "down"),
         createSpin(left,  "red", mapSize, "left")
     ]
-    return new Block(spins, mapSize)
+    return new Block(spins, mapSize, "Z-Block")
 }
 
 function createSpin(squares, color, mapSize, orientation) {
@@ -255,7 +255,8 @@ function createSpin(squares, color, mapSize, orientation) {
 }
 
 class Block {
-    constructor(spins, mapSize) {
+    constructor(spins, mapSize, name) {
+        this.name = name;
         this.id = uuidv4();
         this.mapSize = mapSize;
         this.spins = spins;
@@ -294,16 +295,12 @@ class Block {
     }
 
     moveDown(map) {
-        if ((this.y) > 0) {
-            this.y--;
-            if (hit(map, this)) {
-                this.y++;
-                return false;
-            }
-            return true;
-        } else {
+        this.y--;
+        if (hit(map, this)) {
+            this.y++;
             return false;
         }
+        return true;
     }
 
     moveRight(map) {
