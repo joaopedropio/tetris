@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "main": "index.html",
   "scripts": {
-    "dev": "nw .",
-    "prod": "nwbuild -p linux64 -o dist ."
+    "clean": "shx rm -rf dist",
+    "build": "npm run clean && tsc && shx cp tetris.mp3 style.css index.html package.json dist",
+    "dev": "npm run build && nw dist",
+    "prod": "shx rm -rf out && nwbuild -p linux64 -o out dist"
   },
   "devDependencies": {
-    "nw-builder": "^3.5.7"
+    "nw-builder": "^3.5.7",
+    "shx": "^0.3.3"
   }
 }

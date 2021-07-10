@@ -18,7 +18,7 @@ let cycles = 10;
 // input
 // let inputInterface = "human";
 let inputInterface = "bot";
-let input = "";
+let input: MoveDirection = "";
 
 // curent hit
 let currentHitX = 0;
@@ -31,19 +31,19 @@ let firstLoop = 0;
 // bot
 const bot = new Bot();
 
-function initialize() {
+function initialize(context: CanvasRenderingContext2D) {
     if (firstLoop != 0) {
         return;
     }
-    drawNextBlock(nextBlock);
-    drawScore();
+    drawNextBlock(context, nextBlock);
+    drawScore(context);
     bot.whereToMove(gameMap, currentBlock, nextBlock);
     firstLoop++;
 }
 
-function gameLoop(context) {
-    initialize();
-    handleInput();
+function gameLoop(context: CanvasRenderingContext2D) {
+    initialize(context);
+    handleInput(context);
     if (wait()) {
         return;
     }
@@ -60,16 +60,18 @@ function gameLoop(context) {
         increaseScore("lockedBlock");
         currentBlock = nextBlock;
         nextBlock = setNewBlock();
-        drawNextBlock(nextBlock);
-        drawScore();
+        drawNextBlock(context, nextBlock);
+        drawScore(context);
         bot.whereToMove(gameMap, currentBlock, nextBlock);
     }
-    let clonedMap = cloneMap(gameMap);
+    let clonedMap = cloneBoard(gameMap);
     insertBlock(clonedMap, currentBlock);
     drawMap(context, clonedMap, width, height, squareSize);
 }
 
-function increaseScore(reason, count) {
+type InscreaseScoreReason =  "lockedBlock" | "deletedRows";
+
+function increaseScore(reason: InscreaseScoreReason, count?: number): void {
     switch (reason) {
         case "lockedBlock":
             score += height - currentHitY;
@@ -88,7 +90,7 @@ function increaseScore(reason, count) {
     }
 }
 
-function removeFilledRows(map) {
+function removeFilledRows(map: Board): void {
     let rowsFilledCount = 0;
     for (let i = 0; i < height - 1; i++) {
         if (isRowFilled(map, i)) {
@@ -102,7 +104,7 @@ function removeFilledRows(map) {
     }
 }
 
-function shiftRows(map, startRow, endRow) {
+function shiftRows(map: Board, startRow: number, endRow: Number): void {
     for (let y = startRow; y < endRow; y++) {
         for (let x = 0; x < width; x++) {
             map[x][y - 1] = map[x][y]
@@ -110,7 +112,7 @@ function shiftRows(map, startRow, endRow) {
     }
 }
 
-function isRowFilled(map, row) {
+function isRowFilled(map: Board, row: number): Boolean {
     for (let i = 0; i < width; i++) {
        if (map[i][row].empty) {
            return false;
@@ -119,11 +121,11 @@ function isRowFilled(map, row) {
     return true;
 }
 
-function lost() {
+function lost(): Boolean {
     return currentHitY > height - 2;
 }
 
-function hit(map, block) {
+function hit(map: Board, block: Block): Boolean {
     for (let x = 0; x < block.mapSize; x++) {
         for (let y = 0; y < block.mapSize; y++) {
             let mapSquare;
@@ -151,7 +153,7 @@ function hit(map, block) {
     return false;
 }
 
-function setNewBlock() {
+function setNewBlock(): Block {
     let block = randomBlock();
     block.y = height;
     block.x = Math.floor(width / 2) - 2;
@@ -159,7 +161,7 @@ function setNewBlock() {
 }
 
 
-function insertBlock(map, block) {
+function insertBlock(map: Board, block: Block): void {
     for (let i = 0; i < block.mapSize; i++) {
         for (let j = 0; j < block.mapSize; j++) {
             let currentSquare = block.map()[i][j];
@@ -170,7 +172,7 @@ function insertBlock(map, block) {
     }
 }
 
-function randomBlock() {
+function randomBlock(): Block {
     const blocks = [
         IBlock(),
         JBlock(),
@@ -184,7 +186,7 @@ function randomBlock() {
     return blocks[index];
 }
 
-function wait() {
+function wait(): boolean {
     if (count == 0) {
         count++
         return false;
@@ -199,7 +201,7 @@ function wait() {
     return true;
 }
 
-function keyPush(evt) {
+function keyPush(evt: KeyboardEvent): void {
     switch (evt.keyCode) {
         case 68: input = "right";            break; // d
         case 65: input = "left";             break; // a

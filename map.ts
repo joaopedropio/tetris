@@ -8,7 +8,7 @@ const borderWidth = 10;
 const yOffset = 80;
 const xOffset = 0 + borderWidth;
 
-function createMap(value, x, y) {
+function createMap(value: Square, x: number, y: number): Board {
     var map = Array(x);
     for (let i = 0; i < x; i++) {
         map[i] = Array(y);
@@ -18,3 +18,5 @@ function createMap(value, x, y) {
     }
     return map;
 }
+
+type Board = Square[][];

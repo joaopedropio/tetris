@@ -1,4 +1,4 @@
-function calculatePoints(map) {
+function calculatePoints(map: Board): number {
     let ho = holes(map);
     let he = heightness(map);
     let bu = bumpiness(map);
@@ -8,7 +8,7 @@ function calculatePoints(map) {
 }
 
 // do not trust this function
-function holes(map) {
+function holes(map: Board): number {
     let count = 0;
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
@@ -24,7 +24,7 @@ function holes(map) {
     return count;
 }
 
-function heightness(map) {
+function heightness(map: Board): number {
     let count = 0;
     for (let x = 0; x < width; x++) {
         count += highestSquare(map, x);
@@ -32,7 +32,7 @@ function heightness(map) {
     return count;
 }
 
-function bumpiness(map) {
+function bumpiness(map: Board): number {
     let count = 0;
     let lastSquareHeight = 0;
     for (let x = 0; x < width; x++) {
@@ -47,7 +47,7 @@ function bumpiness(map) {
     return count;
 }
 
-function highestSquare(map, x) {
+function highestSquare(map: Board, x: number): number {
     for (let y = height - 1; y > 0; y--) {
         if (!map[x][y].empty) {
             return y;
@@ -56,7 +56,7 @@ function highestSquare(map, x) {
     return 0;
 }
 
-function filledRows(map) {
+function filledRows(map: Board): number {
     let rowsFilledCount = 0;
     for (let i = 0; i < height; i++) {
         if (isRowFilled(map, i)) {

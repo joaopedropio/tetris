@@ -1,18 +1,20 @@
-function handleInput() {
+function handleInput(context: CanvasRenderingContext2D) {
     if (inputInterface == "human") {
-        move(currentBlock, input);
+        if (input != "" || input != undefined) {
+            move(context, currentBlock, input);
+        }
     }
 
     if (inputInterface == "bot") {
         let direction = bot.nextMove();
         if (direction != undefined && direction != "down") {
-            move(currentBlock, direction);
+            move(context, currentBlock, direction);
         }
     }
     input = "";
 }
 
-function move(block, direction) {
+function move(context: CanvasRenderingContext2D, block: Block, direction: MoveDirection) {
     if (direction == "" || direction == undefined) {
         return;
     }
@@ -33,7 +35,7 @@ function move(block, direction) {
         block.moveRight(gameMap);
     }
 
-    let clonedMap = cloneMap(gameMap);
+    let clonedMap = cloneBoard(gameMap);
     insertBlock(clonedMap, block);
     drawMap(context, clonedMap, width, height, squareSize);
 }

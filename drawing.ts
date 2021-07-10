@@ -1,4 +1,4 @@
-function drawNextBlock(block) {
+function drawNextBlock(context: CanvasRenderingContext2D, block: Block) {
     context.fillStyle = "black";
     context.fillRect(420, 0, 100, 200);
     drawString(context, " Next", 425, 190);
@@ -15,7 +15,7 @@ function drawNextBlock(block) {
     let ln = map.length;
     for (let y = 1; y <= ln; y++) {
         for (let x = 0; x <= ln; x++) {
-            let color = ""
+            let color: Color = "black"
             if (x == ln || y == ln) {
                 color = "black"
             } else {
@@ -28,18 +28,18 @@ function drawNextBlock(block) {
 
 }
 
-function drawScore() {
+function drawScore(context: CanvasRenderingContext2D) {
     context.fillStyle = "black";
     context.fillRect(0, 0, 200, 10);
     drawString(context, "Score:" + score, 0, 0);
 }
 
-function drawMap(context, map, width, height, squareSize) {
+function drawMap(context: CanvasRenderingContext2D, map: Board, width: number, height: number, squareSize: number) {
     drawSquares(context, map, width, height, squareSize);
     drawMapBorder(context, width, height, squareSize);
 }
 
-function drawMapBorder(context, width, height, squareSize) {
+function drawMapBorder(context: CanvasRenderingContext2D, width: number, height: number, squareSize: number) {
     const halfBorder = borderWidth / 2;
     context.strokeStyle = "white";
     context.lineWidth = borderWidth;
@@ -68,17 +68,24 @@ function drawMapBorder(context, width, height, squareSize) {
     context.stroke();
 }
 
-function drawSquares(context, map, width, height, squareSize) {
+function drawSquares(context: CanvasRenderingContext2D, map: Board, width: number, height: number, squareSize: number) {
     for (let y = height - 1; y >= 0; y--) {
         for (let x = 0; x < width; x++) {
             const current = map[x][y];
-            pixels = calculateSquarePixels(x, y, width, height, squareSize);
+            const pixels = calculateSquarePixels(x, y, width, height, squareSize);
             drawSquare(context, pixels, current.color);
         }
     }
 }
 
-function calculateSquarePixels(x, y, width, height, squareSize) {
+interface SquarePixels {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+}
+
+function calculateSquarePixels(x: number, y: number, width: number, height: number, squareSize: number): SquarePixels {
     return {
         startX: x * squareSize,
         startY: (height - y - 1) * squareSize,
@@ -87,7 +94,7 @@ function calculateSquarePixels(x, y, width, height, squareSize) {
     }
 }
 
-function calculateSquarePixelsWithOffset(x, y, squareSize, offsetX, offsetY, blockSize) {
+function calculateSquarePixelsWithOffset(x: number, y: number, squareSize: number, offsetX: number, offsetY: number, blockSize: number) {
     return {
         startX: (x * squareSize) + offsetX,
         startY: (y * squareSize) + offsetY,
@@ -96,7 +103,7 @@ function calculateSquarePixelsWithOffset(x, y, squareSize, offsetX, offsetY, blo
     }
 }
 
-function drawSquare(context, squarePixels, color) {
+function drawSquare(context: CanvasRenderingContext2D, squarePixels: SquarePixels, color: Color) {
     const startX = squarePixels.startX;
     const startY = squarePixels.startY;
     const endX = squarePixels.endX;

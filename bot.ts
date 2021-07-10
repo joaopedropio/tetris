@@ -1,16 +1,19 @@
 class Bot {
+    job: MoveJob | null;
+    currentBlockId: uuid | null;
+
     constructor() {
-        this.job = undefined;
-        this.currentBlockId = undefined;
+        this.job = null;
+        this.currentBlockId = null;
     }
 
-    whereToMove(board, current, next) {
-        if (this.currentBlockId == undefined) {
+    whereToMove(board: Board, current: Block, next: Block): void {
+        if (this.currentBlockId == null) {
             this.currentBlockId = current.id;
         }
 
-        if (this.job == undefined) {
-            this.job = new MoveJob(cloneMap(board), cloneBlock(current), cloneBlock(next));
+        if (this.job == null) {
+            this.job = new MoveJob(cloneBoard(board), cloneBlock(current), cloneBlock(next));
             this.job.calculate();
         }
 
@@ -19,18 +22,33 @@ class Bot {
                 this.job.cancel();
             }
             this.currentBlockId = current.id;
-            this.job = new MoveJob(cloneMap(board), cloneBlock(current), cloneBlock(next));
+            this.job = new MoveJob(cloneBoard(board), cloneBlock(current), cloneBlock(next));
             this.job.calculate();
         }
     }
 
-    nextMove() {
+    nextMove(): MoveDirection | undefined {
+        if (this.job == null) {
+            return undefined;
+        }
         return this.job.nextMove();
     }
 }
 
+interface Play {
+    score: number;
+    moviments: MoveDirection[];
+}
+
 class MoveJob {
-    constructor(board, current, next) {
+    currentBlock: Block;
+    nextBlock: Block;
+    map: Board;
+    moviments: MoveDirection[];
+    stopWorking: Boolean;
+    done: Boolean;
+
+    constructor(board: Board, current: Block, next: Block) {
         this.currentBlock = current;
         this.nextBlock = next;
         this.map = board;
@@ -39,26 +57,26 @@ class MoveJob {
         this.done = false;
     }
 
-    isDone() {
+    isDone(): Boolean {
         return this.done;
     }
 
-    cancel() {
+    cancel(): void {
         this.stopWorking = true;
     }
 
-    nextMove() {
+    nextMove(): MoveDirection | undefined {
         return this.moviments.shift();
     }
 
-    async calculate() {
+    async calculate(): Promise<void> {
         let plays = this.calculatePlays();
         let bestPlay = this.pickBestPlay(plays);
         this.moviments = bestPlay.moviments;
         this.done = true;
     }
 
-    pickBestPlay(plays) {
+    pickBestPlay(plays: Play[]) {
         let bestPlay = plays[0];
         for (let i = 1; i < plays.length; i++) {
             if (plays[i].score > bestPlay.score) {
@@ -68,15 +86,15 @@ class MoveJob {
         return bestPlay;
     }
 
-    calculatePlays() {
+    calculatePlays(): Play[] {
         const width = 10;
-        let plays = [];
+        let plays = Array<Play>();
         let currentX = this.mostLeftPossible(this.currentBlock, this.map);
 
         const turns = ["nothing", "clockwise", "doubleClockwise", "counterClockwise"]
         for (let j = 0; j < turns.length; j++) {
             let spinnedBlock = cloneBlock(this.currentBlock);
-            let rotations = [];
+            let rotations = Array<MoveDirection>();
             switch (turns[j]) {
                 case "clockwise":
                     spinnedBlock.spin("clockwise");
@@ -97,11 +115,11 @@ class MoveJob {
                     break;
             }
             for (let i = 0; i < width; i++) {
-                let moviments = [];
+                let moviments = Array<MoveDirection>();
                 for (let k = 0; k < rotations.length; k++) {
                     moviments.push(rotations[k]);
                 }
-                let currentMap = cloneMap(this.map);
+                let currentMap = cloneBoard(this.map);
                 let block = cloneBlock(spinnedBlock);
 
                 if (block.x > currentX) {
@@ -139,9 +157,9 @@ class MoveJob {
         return plays;
     }
 
-    mostLeftPossible(block, map) {
+    mostLeftPossible(block: Block, map: Board) {
         let clonedBlock = cloneBlock(block);
-        let clonedMap = cloneMap(map);
+        let clonedMap = cloneBoard(map);
         while(clonedBlock.moveLeft(clonedMap)) {
             if (clonedBlock.x < -5) {
                 break;

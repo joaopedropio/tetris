@@ -1,4 +1,4 @@
-function drawString(context, n, offsetX, offsetY) {
+function drawString(context: CanvasRenderingContext2D, n: string, offsetX: number, offsetY: number) {
     const chars = n.split('');
     const offsetNextChar = 6;
     const size = 2;
@@ -7,7 +7,7 @@ function drawString(context, n, offsetX, offsetY) {
     }
 }
 
-function drawChar(context, c, offsetNextChar, size, offsetX, offsetY) {
+function drawChar(context: CanvasRenderingContext2D, c: string, offsetNextChar: number, size: number, offsetX: number, offsetY: number) {
     const ch = charMatrix(c);
     for (let x = 1; x < 7; x++) {
         for (let y = 1; y < 9; y++) {
@@ -22,7 +22,7 @@ function drawChar(context, c, offsetNextChar, size, offsetX, offsetY) {
     }
 }
 
-function charMatrix(ch) {
+function charMatrix(ch: string) {
     // numbers
     let numberX = [
         [0, 0, 0, 0, 0, 0, 0],

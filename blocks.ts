@@ -1,4 +1,4 @@
-function IBlock() {
+function IBlock(): Block {
     const up = [
         {x: 0, y: 2},
         {x: 1, y: 2},
@@ -33,7 +33,7 @@ function IBlock() {
     return new Block(spins, mapSize, "I-Block")
 }
 
-function JBlock() {
+function JBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -68,7 +68,7 @@ function JBlock() {
     return new Block(spins, mapSize, "J-Block")
 }
 
-function LBlock() {
+function LBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -103,7 +103,7 @@ function LBlock() {
     return new Block(spins, mapSize, "L-Block")
 }
 
-function OBlock() {
+function OBlock(): Block {
     const up = [
         {x: 1, y: 1},
         {x: 2, y: 1},
@@ -138,7 +138,7 @@ function OBlock() {
     return new Block(spins, mapSize, "O-Block")
 }
 
-function SBlock() {
+function SBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -173,7 +173,7 @@ function SBlock() {
     return new Block(spins, mapSize, "S-Block")
 }
 
-function TBlock() {
+function TBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -204,11 +204,11 @@ function TBlock() {
         createSpin(right, "fuchsia", mapSize, "right"),
         createSpin(down,  "fuchsia", mapSize, "down"),
         createSpin(left,  "fuchsia", mapSize, "left")
-    ]
-    return new Block(spins, mapSize, "T-Block")
+    ];
+    return new Block(spins, mapSize, "T-Block");
 }
 
-function ZBlock() {
+function ZBlock(): Block {
     const up = [
         {x: 0, y: 2},
         {x: 1, y: 2},
@@ -239,12 +239,22 @@ function ZBlock() {
         createSpin(right, "red", mapSize, "right"),
         createSpin(down,  "red", mapSize, "down"),
         createSpin(left,  "red", mapSize, "left")
-    ]
-    return new Block(spins, mapSize, "Z-Block")
+    ];
+    return new Block(spins, mapSize, "Z-Block");
 }
 
-function createSpin(squares, color, mapSize, orientation) {
-    map = createMap(emptySquare(), mapSize, mapSize);
+interface Coordinate {
+    x: number;
+    y: number;
+}
+
+interface Spin {
+    map: Board;
+    orientation: string;
+}
+
+function createSpin(squares: Coordinate[], color: Color, mapSize: number, orientation: string): Spin {
+    let map = createMap(emptySquare(), mapSize, mapSize);
     squares.forEach(square => {
         map[square.x][square.y] = createSquare(color);
     });
@@ -255,7 +265,14 @@ function createSpin(squares, color, mapSize, orientation) {
 }
 
 class Block {
-    constructor(spins, mapSize, name) {
+    name: string;
+    id: uuid;
+    mapSize: number;
+    spins: Spin[];
+    x: number;
+    y: number;
+    currentSpin: number;
+    constructor(spins: Spin[], mapSize: number, name: string) {
         this.name = name;
         this.id = uuidv4();
         this.mapSize = mapSize;
@@ -265,19 +282,15 @@ class Block {
         this.y = 0;
     }
 
-    map() {
-        return cloneMap(this.spins[this.currentSpin].map);
+    map(): Board {
+        return cloneBoard(this.spins[this.currentSpin].map);
     }
 
     orientation() {
         return this.spins[this.currentSpin].orientation;
     }
 
-    mapSize() {
-        return this.mapSize;
-    }
-
-    spin(direction) {
+    spin(direction: SpinDirection) {
         if (direction == "clockwise") {
             if (this.currentSpin == 3) {
                 this.currentSpin = 0;
@@ -294,7 +307,7 @@ class Block {
         }
     }
 
-    moveDown(map) {
+    moveDown(map: Board) {
         this.y--;
         if (hit(map, this)) {
             this.y++;
@@ -303,7 +316,7 @@ class Block {
         return true;
     }
 
-    moveRight(map) {
+    moveRight(map: Board) {
         this.x++;
         if (hit(map, this)) {
             this.x--;
@@ -312,7 +325,7 @@ class Block {
         return true;
     }
     
-    moveLeft(map) {
+    moveLeft(map: Board) {
         this.x--;
         if (hit(map, this)) {
             this.x++;
@@ -329,3 +342,6 @@ class Block {
         this.y--;
     }
 }
+
+type SpinDirection = "clockwise" | "counterClockwise";
+type MoveDirection = "clockwise" | "counterClockwise" | "left" | "right" | "down" | "";
