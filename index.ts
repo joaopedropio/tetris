@@ -1,13 +1,24 @@
+import { Game } from "./game.js";
+
 window.onload = () => {
+    let [ctx, ok] = getContext();
+    if (!ok) {
+        return;
+    }
+
+    let game = new Game(ctx as CanvasRenderingContext2D);
+    document.addEventListener("keydown", game.keyPush)
+    setInterval(() => game.loop(), 1);
+}
+
+function getContext(): [CanvasRenderingContext2D | null, boolean] {
     let canvas = document.getElementById("gc") as HTMLCanvasElement;
     if (canvas == null) {
-        return;
+        return [null, false];
     }
-    canvas
     let context = canvas.getContext("2d") as CanvasRenderingContext2D;
     if (context == null) {
-        return;
+        return [null, false];
     }
-    document.addEventListener("keydown", keyPush)
-    setInterval(() => gameLoop(context), 1);
+    return [context, true];
 }

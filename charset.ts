@@ -1,28 +1,4 @@
-function drawString(context: CanvasRenderingContext2D, n: string, offsetX: number, offsetY: number) {
-    const chars = n.split('');
-    const offsetNextChar = 6;
-    const size = 2;
-    for (let i = 0; i < chars.length; i++) {
-        drawChar(context, chars[i], i * offsetNextChar, size, offsetX, offsetY);
-    }
-}
-
-function drawChar(context: CanvasRenderingContext2D, c: string, offsetNextChar: number, size: number, offsetX: number, offsetY: number) {
-    const ch = charMatrix(c);
-    for (let x = 1; x < 7; x++) {
-        for (let y = 1; y < 9; y++) {
-            let pixel = ch[y][x];
-            if (pixel == 1) {
-                context.fillStyle = "white";
-            } else {
-                context.fillStyle = "black";
-            }
-            context.fillRect(((x + offsetNextChar) * size) + offsetX, (y * size) + offsetY, ((x + offsetNextChar) * size) + offsetX, (y * size) + offsetY);
-        }
-    }
-}
-
-function charMatrix(ch: string) {
+export function matrix(ch: string) {
     // numbers
     let numberX = [
         [0, 0, 0, 0, 0, 0, 0],

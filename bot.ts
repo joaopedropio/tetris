@@ -1,6 +1,11 @@
-class Bot {
+import * as tools from "./tools.js"
+import { Board } from "./board.js"
+import { Block, MoveDirection } from "./block.js"
+import * as judge from "./judge.js"
+
+export class Bot {
     job: MoveJob | null;
-    currentBlockId: uuid | null;
+    currentBlockId: tools.uuid | null;
 
     constructor() {
         this.job = null;
@@ -13,7 +18,7 @@ class Bot {
         }
 
         if (this.job == null) {
-            this.job = new MoveJob(cloneBoard(board), cloneBlock(current), cloneBlock(next));
+            this.job = new MoveJob(board.clone(), current.clone(), next.clone());
             this.job.calculate();
         }
 
@@ -22,7 +27,7 @@ class Bot {
                 this.job.cancel();
             }
             this.currentBlockId = current.id;
-            this.job = new MoveJob(cloneBoard(board), cloneBlock(current), cloneBlock(next));
+            this.job = new MoveJob(board.clone(), current.clone(), next.clone());
             this.job.calculate();
         }
     }
@@ -93,7 +98,7 @@ class MoveJob {
 
         const turns = ["nothing", "clockwise", "doubleClockwise", "counterClockwise"]
         for (let j = 0; j < turns.length; j++) {
-            let spinnedBlock = cloneBlock(this.currentBlock);
+            let spinnedBlock = this.currentBlock.clone();
             let rotations = Array<MoveDirection>();
             switch (turns[j]) {
                 case "clockwise":
@@ -119,8 +124,8 @@ class MoveJob {
                 for (let k = 0; k < rotations.length; k++) {
                     moviments.push(rotations[k]);
                 }
-                let currentMap = cloneBoard(this.map);
-                let block = cloneBlock(spinnedBlock);
+                let currentMap = this.map.clone();
+                let block = spinnedBlock.clone();
 
                 if (block.x > currentX) {
                     while(block.x > currentX) {
@@ -145,9 +150,9 @@ class MoveJob {
                     moviments.push("down");
                 }
 
-                insertBlock(currentMap, block);
+                tools.insertBlock(currentMap, block);
 
-                let points = calculatePoints(currentMap);
+                let points = judge.calculatePoints(currentMap);
                 plays.push({
                     score: points,
                     moviments: moviments 
@@ -158,8 +163,8 @@ class MoveJob {
     }
 
     mostLeftPossible(block: Block, map: Board) {
-        let clonedBlock = cloneBlock(block);
-        let clonedMap = cloneBoard(map);
+        let clonedBlock = block.clone();
+        let clonedMap = map.clone();
         while(clonedBlock.moveLeft(clonedMap)) {
             if (clonedBlock.x < -5) {
                 break;
