@@ -35,6 +35,7 @@ export class Game {
     gameMap = Board.new(width, height);
 
     score: number = 0;
+    highestScore: number = 0;
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.drawer = new Drawer(ctx);
@@ -47,6 +48,7 @@ export class Game {
         }
         this.drawer.drawNextBlock(this.nextBlock);
         this.drawer.drawScore(this.score);
+        this.drawer.drawHighestScore(this.highestScore);
         bot.whereToMove(this.gameMap, this.currentBlock, this.nextBlock);
         firstLoop++;
     }
@@ -72,6 +74,7 @@ export class Game {
         if (hit) {
             if (this.lost(hitX, hitY)) {
                 this.gameMap = Board.new(width, height);
+                this.setHighestScore();
                 this.score = 0;
                 return;
             }
@@ -106,6 +109,13 @@ export class Game {
         input = "";
     }
     
+    private setHighestScore(): void {
+        if (this.score > this.highestScore) {
+            this.highestScore = this.score;
+        }
+        this.drawer.drawHighestScore(this.highestScore);
+    }
+
     private move(block: Block, direction: MoveDirection) {
         if (direction == "" || direction == undefined) {
             return;

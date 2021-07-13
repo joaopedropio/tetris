@@ -71,6 +71,13 @@ export class Drawer {
         }
     }
 
+    public drawHighestScore(highestScore: number): void {
+        let offsetY = 150;
+        let offsetX = (this.width * this.squareSize) + (this.boardBorder * 3); // 420
+
+        this.drawString(this.ctx, "Highest: " + highestScore.toString(), offsetX, offsetY);
+    }
+
     public drawMap(map: Board, width: number, height: number, squareSize: number) {
         this.drawSquares(map, width, height, squareSize);
         this.drawMapBorder(width, height, squareSize);
