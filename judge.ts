@@ -6,9 +6,9 @@ export function calculatePoints(board: Board): number {
     let ho = holes(board);
     let he = heightness(board);
     let bu = bumpiness(board);
-    let fi = filledRows(board) + 1000;
+    let fi = filledRows(board) + 10000;
 
-    return (- Math.pow(ho, 3) - (2 * he) - (Math.pow(bu, 2)) + (Math.pow(fi, 3)));
+    return (Math.pow(fi, 3)) - Math.pow(ho, 3) - (2 * he) - (Math.pow(bu, 2));
 }
 
 // do not trust this function

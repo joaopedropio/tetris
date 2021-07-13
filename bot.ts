@@ -94,49 +94,18 @@ class MoveJob {
     calculatePlays(): Play[] {
         const width = 10;
         let plays = Array<Play>();
-
         const turns = ["nothing", "clockwise", "doubleClockwise", "counterClockwise"]
-        for (let j = 0; j < turns.length; j++) {
+        for (let rotation = 0; rotation < turns.length; rotation++) {
             let currentX = this.mostLeftPossible(this.currentBlock, this.map);
-            let spinnedBlock = this.currentBlock.clone();
-            let rotations = Array<MoveDirection>();
-            this.rotate(turns[j], spinnedBlock, rotations)
             for (let i = 0; i < width; i++) {
-                let moviments = Array<MoveDirection>();
-                for (let k = 0; k < rotations.length; k++) {
-                    moviments.push(rotations[k]);
-                }
                 let currentMap = this.map.clone();
-                let block = spinnedBlock.clone();
-
-                if (block.x > currentX) {
-                    while(block.x > currentX) {
-                        if(block.moveLeft(currentMap)) {
-                            moviments.push("left");
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (block.x < currentX) {
-                    while(block.x < currentX) {
-                        if (block.moveRight(currentMap)) {
-                            moviments.push("right");
-                        } else {
-                            break;
-                        }
-                    }
-                }
+                let block = this.currentBlock.clone();
+                let moviments = Array<MoveDirection>();
+                this.rotate(turns[rotation], block, moviments)
+                this.moveThroughBoard(currentMap, block, moviments, currentX);
                 currentX++;
-        
-                while(block.moveDown(currentMap)) {
-                    moviments.push("down");
-                }
-
-                tools.insertBlock(currentMap, block);
-
-                let points = judge.calculatePoints(currentMap);
                 plays.push({
-                    score: points,
+                    score: judge.calculatePoints(currentMap),
                     moviments: moviments 
                 });
             }
@@ -144,7 +113,33 @@ class MoveJob {
         return plays;
     }
 
-    rotate(direction: string, block: Block, rotations: MoveDirection[]) {
+    moveThroughBoard(board: Board, block: Block, moviments: MoveDirection[], currentX: number): void {
+        if (block.x > currentX) {
+            while(block.x > currentX) {
+                if(block.moveLeft(board)) {
+                    moviments.push("left");
+                } else {
+                    break;
+                }
+            }
+        } else if (block.x < currentX) {
+            while(block.x < currentX) {
+                if (block.moveRight(board)) {
+                    moviments.push("right");
+                } else {
+                    break;
+                }
+            }
+        }
+
+        while(block.moveDown(board)) {
+            moviments.push("down");
+        }
+
+        tools.insertBlock(board, block);
+    }
+
+    rotate(direction: string, block: Block, rotations: MoveDirection[]): void {
         switch (direction) {
             case "clockwise":
                 block.spin("clockwise");
@@ -169,11 +164,7 @@ class MoveJob {
     mostLeftPossible(block: Block, map: Board) {
         let clonedBlock = block.clone();
         let clonedMap = map.clone();
-        while(clonedBlock.moveLeft(clonedMap)) {
-            if (clonedBlock.x < -5) {
-                break;
-            }
-        }
+        while(clonedBlock.moveLeft(clonedMap));
         return clonedBlock.x;
     }
 }
