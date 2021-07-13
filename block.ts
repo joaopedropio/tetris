@@ -1,4 +1,7 @@
-function IBlock() {
+import * as tools from "./tools.js"
+import { Board, Color, Square } from "./board.js"
+
+function IBlock(): Block {
     const up = [
         {x: 0, y: 2},
         {x: 1, y: 2},
@@ -33,7 +36,7 @@ function IBlock() {
     return new Block(spins, mapSize, "I-Block")
 }
 
-function JBlock() {
+function JBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -68,7 +71,7 @@ function JBlock() {
     return new Block(spins, mapSize, "J-Block")
 }
 
-function LBlock() {
+function LBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -103,7 +106,7 @@ function LBlock() {
     return new Block(spins, mapSize, "L-Block")
 }
 
-function OBlock() {
+function OBlock(): Block {
     const up = [
         {x: 1, y: 1},
         {x: 2, y: 1},
@@ -138,7 +141,7 @@ function OBlock() {
     return new Block(spins, mapSize, "O-Block")
 }
 
-function SBlock() {
+function SBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -173,7 +176,7 @@ function SBlock() {
     return new Block(spins, mapSize, "S-Block")
 }
 
-function TBlock() {
+function TBlock(): Block {
     const up = [
         {x: 0, y: 1},
         {x: 1, y: 1},
@@ -204,11 +207,11 @@ function TBlock() {
         createSpin(right, "fuchsia", mapSize, "right"),
         createSpin(down,  "fuchsia", mapSize, "down"),
         createSpin(left,  "fuchsia", mapSize, "left")
-    ]
-    return new Block(spins, mapSize, "T-Block")
+    ];
+    return new Block(spins, mapSize, "T-Block");
 }
 
-function ZBlock() {
+function ZBlock(): Block {
     const up = [
         {x: 0, y: 2},
         {x: 1, y: 2},
@@ -239,45 +242,71 @@ function ZBlock() {
         createSpin(right, "red", mapSize, "right"),
         createSpin(down,  "red", mapSize, "down"),
         createSpin(left,  "red", mapSize, "left")
-    ]
-    return new Block(spins, mapSize, "Z-Block")
+    ];
+    return new Block(spins, mapSize, "Z-Block");
 }
 
-function createSpin(squares, color, mapSize, orientation) {
-    map = createMap(emptySquare(), mapSize, mapSize);
+interface Coordinate {
+    x: number;
+    y: number;
+}
+
+interface Spin {
+    board: Board;
+    orientation: string;
+}
+
+function createSpin(squares: Coordinate[], color: Color, mapSize: number, orientation: string): Spin {
+    let map = Board.new(mapSize, mapSize);
     squares.forEach(square => {
-        map[square.x][square.y] = createSquare(color);
+        map.setSquare(square.x, square.y, Square.new(color));
     });
     return {
-        map: map,
+        board: map,
         orientation: orientation
     };
 }
 
-class Block {
-    constructor(spins, mapSize, name) {
-        this.name = name;
-        this.id = uuidv4();
-        this.mapSize = mapSize;
-        this.spins = spins;
-        this.currentSpin = 0;
-        this.x = 0;
-        this.y = 0;
+export class Block {
+    id: tools.uuid = tools.uuidv4();
+    x: number = 0;
+    y: number = 0;
+    currentSpin: number = 0;
+    constructor(readonly spins: Spin[], readonly mapSize: number, readonly name: string) { }
+
+    static random(): Block {
+        const blocks = [
+            IBlock(),
+            JBlock(),
+            LBlock(),
+            OBlock(),
+            SBlock(),
+            TBlock(),
+            ZBlock()
+        ]
+        const index = tools.getRandomInt(0, 7);
+        return blocks[index];
     }
 
-    map() {
-        return cloneMap(this.spins[this.currentSpin].map);
+    clone(): Block {
+        let clonedBlock = new Block(this.spins, this.mapSize, this.name);
+        clonedBlock.id = this.id;
+        clonedBlock.currentSpin = this.currentSpin;
+        clonedBlock.x = this.x;
+        clonedBlock.y = this.y;
+    
+        return clonedBlock;
+    }
+
+    map(): Board {
+        return this.spins[this.currentSpin].board.clone();
     }
 
     orientation() {
         return this.spins[this.currentSpin].orientation;
     }
 
-    mapSize() {
-        return this.mapSize;
-    }
-
-    spin(direction) {
+    spin(direction: SpinDirection) {
         if (direction == "clockwise") {
             if (this.currentSpin == 3) {
                 this.currentSpin = 0;
@@ -294,27 +323,27 @@ class Block {
         }
     }
 
-    moveDown(map) {
+    moveDown(map: Board) {
         this.y--;
-        if (hit(map, this)) {
+        if (tools.hit(map, this)[0]) {
             this.y++;
             return false;
         }
         return true;
     }
 
-    moveRight(map) {
+    moveRight(map: Board) {
         this.x++;
-        if (hit(map, this)) {
+        if (tools.hit(map, this)[0]) {
             this.x--;
             return false;
         }
         return true;
     }
     
-    moveLeft(map) {
+    moveLeft(map: Board) {
         this.x--;
-        if (hit(map, this)) {
+        if (tools.hit(map, this)[0]) {
             this.x++;
             return false;
         }
@@ -329,3 +358,6 @@ class Block {
         this.y--;
     }
 }
+
+export type SpinDirection = "clockwise" | "counterClockwise";
+export type MoveDirection = "clockwise" | "counterClockwise" | "left" | "right" | "down" | "";
