@@ -17,7 +17,7 @@ export class Drawer {
     private readonly squareBorder = 3;
 
     // map square
-    private readonly boardBorder = 40;
+    private readonly boardBorder = 10;
     private readonly halfBoardBorder = this.boardBorder / 2;
 
     // offsets to place game a little down

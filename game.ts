@@ -4,17 +4,10 @@ import { Board } from "./board.js";
 import { Block, MoveDirection } from "./block.js"
 import { Bot } from "./bot.js"
 
-
 // board size
 const width = 10;
 const height = 20;
 const squareSize = 24;
-const backGroundColor = "black";
-
-//
-
-
-//
 
 // timer
 let count = 0;
@@ -25,18 +18,12 @@ let cycles = 10;
 let inputInterface = "bot";
 let input: MoveDirection = "";
 
-// curent hit
-let currentHitX = 0;
-let currentHitY = 0;
-
 // score
 // let score = 0;
 let firstLoop = 0;
 
 // bot
 const bot = new Bot();
-
-
 
 type InscreaseScoreReason =  "lockedBlock" | "deletedRows";
 
@@ -81,16 +68,17 @@ export class Game {
             return;
         }
         this.currentBlock.moveBlock();
-        if (tools.hit(this.gameMap, this.currentBlock)[0]) {
-            if (this.lost()) {
+        let [hit, hitX, hitY] = tools.hit(this.gameMap, this.currentBlock);
+        if (hit) {
+            if (this.lost(hitX, hitY)) {
                 this.gameMap = Board.new(width, height);
                 this.score = 0;
                 return;
             }
             this.currentBlock.unmoveBlock();
             tools.insertBlock(this.gameMap, this.currentBlock);
-            this.removeFilledRows(this.gameMap);
-            this.increaseScore("lockedBlock");
+            this.removeFilledRows(this.gameMap, hitY);
+            this.increaseScore("lockedBlock", hitY);
             this.currentBlock = this.nextBlock;
             this.nextBlock = this.setNewBlock();
             this.drawer.drawNextBlock(this.nextBlock);
@@ -144,10 +132,10 @@ export class Game {
         this.drawer.drawMap(clonedMap, width, height, squareSize);
     }
 
-    private increaseScore(reason: InscreaseScoreReason, count?: number): void {
+    private increaseScore(reason: InscreaseScoreReason, hitY: number, count?: number): void {
         switch (reason) {
             case "lockedBlock":
-                this.score += height - currentHitY;
+                this.score += height - hitY;
                 break;
             case "deletedRows":
                 switch (count) {
@@ -163,7 +151,7 @@ export class Game {
         }
     }
     
-    private removeFilledRows(map: Board): void {
+    private removeFilledRows(map: Board, hitY: number): void {
         let rowsFilledCount = 0;
         for (let i = 0; i < height - 1; i++) {
             if (tools.isRowFilled(map, i)) {
@@ -173,7 +161,7 @@ export class Game {
             }
         }
         if (rowsFilledCount > 0) {
-            this.increaseScore("deletedRows", rowsFilledCount);
+            this.increaseScore("deletedRows", hitY, rowsFilledCount);
         }
     }
     
@@ -185,8 +173,8 @@ export class Game {
         }
     }
     
-    private lost(): Boolean {
-        return currentHitY > height - 2;
+    private lost(hitX: number, hitY: number): Boolean {
+        return hitY > height - 2;
     }
 
     private setNewBlock(): Block {
@@ -210,6 +198,4 @@ export class Game {
         count++
         return true;
     }
-    
-
 }

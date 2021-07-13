@@ -94,31 +94,13 @@ class MoveJob {
     calculatePlays(): Play[] {
         const width = 10;
         let plays = Array<Play>();
-        let currentX = this.mostLeftPossible(this.currentBlock, this.map);
 
         const turns = ["nothing", "clockwise", "doubleClockwise", "counterClockwise"]
         for (let j = 0; j < turns.length; j++) {
+            let currentX = this.mostLeftPossible(this.currentBlock, this.map);
             let spinnedBlock = this.currentBlock.clone();
             let rotations = Array<MoveDirection>();
-            switch (turns[j]) {
-                case "clockwise":
-                    spinnedBlock.spin("clockwise");
-                    rotations.push("clockwise");
-                    break;
-                case "doubleClockwise":
-                    spinnedBlock.spin("clockwise");
-                    rotations.push("clockwise");
-                    spinnedBlock.spin("clockwise");
-                    rotations.push("clockwise");
-                    break;
-                case "counterClockwise":
-                    spinnedBlock.spin("counterClockwise");
-                    rotations.push("counterClockwise");
-                    break;
-                case "nothing":
-                default:
-                    break;
-            }
+            this.rotate(turns[j], spinnedBlock, rotations)
             for (let i = 0; i < width; i++) {
                 let moviments = Array<MoveDirection>();
                 for (let k = 0; k < rotations.length; k++) {
@@ -160,6 +142,28 @@ class MoveJob {
             }
         }
         return plays;
+    }
+
+    rotate(direction: string, block: Block, rotations: MoveDirection[]) {
+        switch (direction) {
+            case "clockwise":
+                block.spin("clockwise");
+                rotations.push("clockwise");
+                break;
+            case "doubleClockwise":
+                block.spin("clockwise");
+                rotations.push("clockwise");
+                block.spin("clockwise");
+                rotations.push("clockwise");
+                break;
+            case "counterClockwise":
+                block.spin("counterClockwise");
+                rotations.push("counterClockwise");
+                break;
+            case "nothing":
+            default:
+                break;
+        }
     }
 
     mostLeftPossible(block: Block, map: Board) {
