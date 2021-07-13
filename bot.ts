@@ -165,6 +165,6 @@ class MoveJob {
         let clonedBlock = block.clone();
         let clonedMap = map.clone();
         while(clonedBlock.moveLeft(clonedMap));
-        return clonedBlock.x;
+        return clonedBlock.x - 2;
     }
 }

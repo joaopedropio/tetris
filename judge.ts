@@ -11,7 +11,6 @@ export function calculatePoints(board: Board): number {
     return (Math.pow(fi, 3)) - Math.pow(ho, 3) - (2 * he) - (Math.pow(bu, 2));
 }
 
-// do not trust this function
 function holes(board: Board): number {
     let count = 0;
     for (let x = 0; x < board.width; x++) {
