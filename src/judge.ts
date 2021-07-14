@@ -1,17 +1,17 @@
-import * as tools from "./tools.js"
-import { Board } from "./board.js"
+import * as tools from "./tools"
+import { Board } from "./board"
 
 
 export function calculatePoints(board: Board): number {
     let ho = holes(board);
     let he = heightness(board);
     let bu = bumpiness(board);
-    let fi = filledRows(board) + 10000;
+    let fi = filledRows(board);
 
-    return (Math.pow(fi, 3)) - Math.pow(ho, 3) - (2 * he) - (Math.pow(bu, 2));
+    return (Math.pow(fi + 100, 3)) - Math.pow(ho + 10, 3) - (2 * he) - (bu * 10);
 }
 
-function holes(board: Board): number {
+export function holes(board: Board): number {
     let count = 0;
     for (let x = 0; x < board.width; x++) {
         for (let y = 0; y < board.height; y++) {
@@ -19,7 +19,6 @@ function holes(board: Board): number {
                 for (let up = y + 1; up < board.height; up++) {
                     if (!board.getSquare(x, up).empty) {
                         count++;
-                        break;
                     }
                 }
             }
@@ -60,7 +59,7 @@ function highestSquare(board: Board, x: number): number {
     return 0;
 }
 
-function filledRows(board: Board): number {
+export function filledRows(board: Board): number {
     let rowsFilledCount = 0;
     for (let i = 0; i < board.height; i++) {
         if (tools.isRowFilled(board, i)) {

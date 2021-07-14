@@ -1,8 +1,8 @@
-import * as tools from "./tools.js"
-import { Drawer } from "./drawing.js"
-import { Board } from "./board.js";
-import { Block, MoveDirection } from "./block.js"
-import { Bot } from "./bot.js"
+import * as tools from "./tools"
+import { Drawer } from "./drawing"
+import { Board } from "./board";
+import { Block, MoveDirection } from "./block"
+import { Bot } from "./bot"
 
 // board size
 const width = 10;

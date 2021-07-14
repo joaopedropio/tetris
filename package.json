@@ -4,13 +4,18 @@
   "main": "index.html",
   "scripts": {
     "clean": "shx rm -rf dist",
-    "build": "npm run clean && tsc && shx cp favicon.ico tetris.mp3 style.css index.html package.json dist",
+    "build": "npm run clean && tsc && shx cp favicon.ico tetris.mp3 style.css index.html package.json dist && node fixJsExtension.js",
     "dev": "npm run build && http-server dist",
     "prod": "shx rm -rf out && npm run build && nwbuild -p linux64 -o out dist && ./out/tetris/linux64/tetris &"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "filehound": "^1.17.4",
     "http-server": "^0.12.3",
+    "jest": "^27.0.6",
     "nw-builder": "^3.5.7",
-    "shx": "^0.3.3"
+    "shx": "^0.3.3",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.5"
   }
 }

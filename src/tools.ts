@@ -1,5 +1,5 @@
-import { Board, Square } from "./board.js"
-import { Block } from "./block.js"
+import { Board, Square } from "./board"
+import { Block } from "./block"
 export type uuid = string;
 
 export function uuidv4(): uuid {
@@ -23,6 +23,64 @@ export function insertBlock(board: Board, block: Block): void {
                 board.setSquare(block.x + i, block.y + j, currentSquare);
             }
         }
+    }
+}
+
+export function sameBoard(board1: string[], board2: string[]): boolean {
+    if (board1.length != board2.length) {
+        return false;
+    }
+    for (let i = 0; i < board1.length; i++) {
+        if (board1[i] != board2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+export function convertToStringArray(board: Board): string[] {
+    let boardString: string[] = [];
+    for (let y = board.height - 1; y >= 0; y--) {
+        let row = "";
+        for (let x = 0; x < board.width; x++) {
+            if (board.getSquare(x, y).color == "black") {
+                row += "-";
+            } else {
+                row += board.getSquare(x, y).color[0];
+            }
+        }
+        boardString.push(row);
+    }
+    return boardString;
+}
+
+export function convertToBoard(map: string[]): Board {
+    let height = map.length;
+    let width = map[0].length;
+    let board = Board.new(width, height);
+
+    for (let y = 0; y < map.length; y++) {
+        let rowIndex = map.length - y - 1;
+        let row = map[rowIndex];
+        for (let x = 0; x < row.length; x++) {
+            let square = letterToSquare(row[x]);
+            board.setSquare(x, y, square);
+        }
+    }
+    return board;
+}
+
+function letterToSquare(letter: string): Square {
+    switch (letter) {
+        case "r": return Square.new("red");
+        case "b": return Square.new("blue");
+        case "a": return Square.new("aqua");
+        case "o": return Square.new("orange");
+        case "y": return Square.new("yellow");
+        case "l": return Square.new("lime");
+        case "f": return Square.new("fuchsia");
+        case "-":
+        default : return Square.empty(); 
     }
 }
 

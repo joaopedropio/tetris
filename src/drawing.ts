@@ -1,6 +1,6 @@
-import { Color, Board } from "./board.js"
-import { Block } from "./block.js"
-import * as Charset from "./charset.js"
+import { Color, Board } from "./board"
+import { Block } from "./block"
+import * as Charset from "./charset"
 
 interface SquarePixels {
     startX: number;

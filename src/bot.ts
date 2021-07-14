@@ -1,7 +1,7 @@
-import * as tools from "./tools.js"
-import { Board } from "./board.js"
-import { Block, MoveDirection } from "./block.js"
-import * as judge from "./judge.js"
+import * as tools from "./tools"
+import { Board } from "./board"
+import { Block, MoveDirection } from "./block"
+import * as judge from "./judge"
 
 export class Bot {
     job: MoveJob | null;

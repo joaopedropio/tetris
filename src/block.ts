@@ -1,5 +1,5 @@
-import * as tools from "./tools.js"
-import { Board, Color, Square } from "./board.js"
+import * as tools from "./tools"
+import { Board, Color, Square } from "./board"
 
 function IBlock(): Block {
     const up = [
