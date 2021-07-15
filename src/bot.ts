@@ -1,15 +1,20 @@
 import * as tools from "./tools"
 import { Board } from "./board"
 import { Block, MoveDirection } from "./block"
+import { Controller } from "./controller"
 import * as judge from "./judge"
 
-export class Bot {
+export class Bot implements Controller {
     job: MoveJob | null;
     currentBlockId: tools.uuid | null;
 
     constructor() {
         this.job = null;
         this.currentBlockId = null;
+    }
+
+    currentState(board: Board): void {
+
     }
 
     whereToMove(board: Board, current: Block, next: Block): void {
@@ -36,7 +41,11 @@ export class Bot {
         if (this.job == null) {
             return undefined;
         }
-        return this.job.nextMove();
+        let move = this.job.nextMove();
+        if (move == "down" || move == undefined) {
+            return undefined;
+        }
+        return move;
     }
 }
 

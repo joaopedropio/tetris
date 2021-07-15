@@ -360,4 +360,4 @@ export class Block {
 }
 
 export type SpinDirection = "clockwise" | "counterClockwise";
-export type MoveDirection = "clockwise" | "counterClockwise" | "left" | "right" | "down" | "";
+export type MoveDirection = "clockwise" | "counterClockwise" | "left" | "right" | "down" | undefined;

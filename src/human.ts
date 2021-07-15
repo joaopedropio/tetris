@@ -1,5 +1,4 @@
 import { Game } from "./game";
-import { Bot } from "./bot"
 import { SingleUser } from "./user";
 
 window.onload = () => {
@@ -8,9 +7,10 @@ window.onload = () => {
         return;
     }
 
-    let user = new Bot();
+    let user = new SingleUser();
+    document.addEventListener("keydown", createKeyPushIntance(user));
     let game = new Game(ctx as CanvasRenderingContext2D, user);
-    setInterval(() => game.loop(), 1);
+    setInterval(() => game.loop(), 50);
 }
 
 function getContext(): [CanvasRenderingContext2D | null, boolean] {
