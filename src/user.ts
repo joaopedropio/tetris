@@ -1,6 +1,7 @@
 import { Controller } from "./controller";
 import { Board } from "./board"
 import { Block, MoveDirection } from "./block"
+import { RealtimeCommunication } from "./websocket"
 
 
 export class SingleUser implements Controller {
@@ -35,7 +36,7 @@ export class SingleUser implements Controller {
 export class WebSocketUser implements Controller {
     private input: MoveDirection = undefined;
 
-    constructor() {}
+    constructor(private rc: RealtimeCommunication) {}
     
     public keyPush(evt: KeyboardEvent): void {
         switch (evt.keyCode) {
@@ -58,6 +59,8 @@ export class WebSocketUser implements Controller {
     }
 
     whereToMove(board: Board, current: Block, next: Block): void {}
-    currentState(board: Board): void { }
+    currentState(board: Board): void {
+        this.rc.sendBoard(board);
+    }
 }
 
